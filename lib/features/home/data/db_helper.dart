@@ -15,32 +15,43 @@ class DatabaseHelper {
 
   Future<Database> _initDatabase() async {
     String path = join(await getDatabasesPath(), 'meals.db');
-    return await openDatabase(path, version: 1, onCreate: _createDatabase);
+
+    return await openDatabase(
+      path,
+      version: 1,
+      onCreate: (db, version) async {
+        await _createDatabase(db);
+      },
+    );
   }
 
-  Future<void> _createDatabase(Database db, int version) async {
+  Future<void> _createDatabase(Database db) async {
     await db.execute('''
-
-CREATE TABLE meals (
-id INTEGER PRIMARY KEY AUTOINCREMENT
-imageUrl TEXT,
-calories Real,
-description TEXT,
-rate REAL, 
-time TEXT)
-''');
+      CREATE TABLE meals (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        imageUrl TEXT,
+        name TEXT,
+        calories REAL,
+        description TEXT,
+        rate REAL, 
+        time TEXT
+      )
+    ''');
   }
-  Future<int> insertMeal(MealModel meal) async {
-Map<String, dynamic> mealMap = meal. toMap();
-final db = await database;
-return await db.insert('meals', mealMap);}
 
-Future<List<MealModel>> getMeals() async {
-final db = await database; 
-List<Map<String, dynamic>> mealsJson = await db.query('meals');
-List<MealModel> meals = mealsJson.map((mealJson) {
-return MealModel. fromMap(mealJson);
-}).toList();
-return meals;
-}
+  Future<int> insertMeal(MealModel meal) async {
+    Map<String, dynamic> mealMap = meal.toMap();
+    final db = await database;
+    return await db.insert('meals', mealMap);
+  }
+
+  Future<List<MealModel>> getMeals() async {
+    final db = await database;
+    List<Map<String, dynamic>> mealsJson = await db.query('meals');
+    List<MealModel> meals =
+        mealsJson.map((mealJson) {
+          return MealModel.fromMap(mealJson);
+        }).toList();
+    return meals;
+  }
 }

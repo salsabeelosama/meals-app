@@ -26,13 +26,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     "all_the_best_restaurants_and_their_top_menus_are_ready_for_you",
   ];
 
-  void changeLanguage() {
-    if (context.locale == Locale('en')) {
-      context.setLocale(Locale("ar"));
-    } else {
-      context.setLocale(Locale("en"));
-    }
-  }
+
 
   int pageIndex = 0;
 
@@ -192,10 +186,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: changeLanguage,
-        child: Icon(Icons.language),
-      ),
+     
     );
   }
 }

@@ -24,5 +24,9 @@
     "rate": "التقييم",
     "description": "الوصف",
     "time": "الوقت",
-    "save": "حفظ"
+    "save": "حفظ",
+    "change_language":"تغيير اللغة",
+    "calories" : "السعرات الحرارية",
+    "my_profile":"حسابي"
+    
 }

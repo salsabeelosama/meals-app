@@ -24,5 +24,8 @@
     "rate": "Rate",
     "description": "Description",
     "time": "Time",
-    "save": "Save"
+    "save": "Save",
+    "change_language":"Change Language",
+    "calories" : "Calories",
+    "my_profile":"My Profile"
 }

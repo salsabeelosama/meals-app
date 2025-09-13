@@ -1,5 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:depi_project/core/app_color.dart';
+import 'package:depi_project/features/home/Meal_Details.dart';
+import 'package:depi_project/features/home/data/db_helper.dart';
+import 'package:depi_project/features/home/data/meal_model.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
@@ -22,51 +26,6 @@ class _HomeScreenState extends State<HomeScreen> {
     Image.asset('assets/images/page3.png'),
   ];
   int currentindex = 0;
-
-  List<Widget> listtitle = [
-    ListTile(
-      leading: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.asset('assets/images/smothie.png'),
-      ),
-      title: Text(
-        'breakfast_smoothie'.tr(),
-        style: TextStyle(color: AppColor.textColor, fontSize: 18),
-      ),
-      subtitle: Text(
-        '350_calories'.tr(),
-        style: TextStyle(color: AppColor.primaryColor, fontSize: 16),
-      ),
-    ),
-    ListTile(
-      leading: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.asset('assets/images/soup.png'),
-      ),
-      title: Text(
-        'vegetable_soup'.tr(),
-        style: TextStyle(color: AppColor.textColor, fontSize: 18),
-      ),
-      subtitle: Text(
-        '600_calories'.tr(),
-        style: TextStyle(color: AppColor.primaryColor, fontSize: 16),
-      ),
-    ),
-    ListTile(
-      leading: ClipRRect(
-        borderRadius: BorderRadius.circular(10),
-        child: Image.asset('assets/images/chiken.png'),
-      ),
-      title: Text(
-        'chicken_salad'.tr(),
-        style: TextStyle(color: AppColor.textColor, fontSize: 18),
-      ),
-      subtitle: Text(
-        '450_calories'.tr(),
-        style: TextStyle(color: AppColor.primaryColor, fontSize: 16),
-      ),
-    ),
-  ];
 
   @override
   Widget build(BuildContext context) {
@@ -146,10 +105,66 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Expanded(
-              child: ListView.builder(
-                itemCount: listtitle.length,
-                itemBuilder: (context, index) {
-                  return listtitle[index];
+              child: FutureBuilder(
+                future: DatabaseHelper.instance.getMeals(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasData) {
+                    if (snapshot.data!.isEmpty) {
+                      return Text("There is no data");
+                    }
+                    return ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        MealModel mealModel = snapshot.data![index];
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder:
+                                    (context) => MealDetails(meal: mealModel),
+                              ),
+                            );
+                          },
+                          child: Padding(
+                            padding: EdgeInsets.only(left: 12.w),
+                            child: ListTile(
+                              leading: ClipRRect(
+                                borderRadius: BorderRadiusGeometry.circular(
+                                  15.r,
+                                ),
+                                child: CachedNetworkImage(
+                                  imageUrl: snapshot.data![index].imageUrl,
+                                  height: 100.h,
+                                  width: 100.w,
+                                  fit: BoxFit.cover,
+                                  errorWidget:
+                                      (context, url, error) => Image.network(
+                                        'https://uptownprinters.ca/assets/no_image_placeholder.png',
+                                        height: 100.h,
+                                        width: 100.w,
+                                        fit: BoxFit.cover,
+                                      ),
+                                ),
+                              ),
+                              title: Text(snapshot.data![index].name),
+                              subtitle: Text(
+                                "${snapshot.data![index].calories.toString()} calories",
+                                style: TextStyle(color: AppColor.primaryColor),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                    );
+                  } else if (snapshot.hasError) {
+                    return Text(
+                      "Something went wrong \n please try again later ",
+                    );
+                  }
+                  return Text("Nothing returned");
                 },
               ),
             ),
